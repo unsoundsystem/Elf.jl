@@ -1,6 +1,6 @@
 module ELF
 
-export Elf64_Ehdr, Elf64_Shdr, IS_ELF, print_section 
+export Elf64_Ehdr, Elf64_Shdr, IS_ELF, print_section, EI_CLASS, ELFCLASS64, EI_DATA, ELFDATA2MSB, SHT_NOBITS
 
 const EI_CLASS = 5
 const ELFCLASS64 = UInt8(2)
@@ -27,6 +27,7 @@ const EIMAG3 = 3
 const ELFMAG3 = UInt8('L')
 const EIMAG4 = 4
 const ELFMAG4 = UInt8('F')
+const SHT_NOBITS = 8
 
 struct Elf64_Ehdr
 	e_ident::Array{UInt8, 1}
@@ -98,6 +99,17 @@ struct Elf64_Phdr
 	p_filesz::Elf64_Xword
 	p_memsz::Elf64_Xword
 	p_align::Elf64_Xword
+
+	function Elf64_Phdr(head::Array{UInt8, 1})
+		new(byte_array2uint32(head[1:4]),
+		    byte_array2uint32(head[5:8]),
+		    byte_array2uint64(head[9:16]),
+		    byte_array2uint64(head[17:24]),
+		    byte_array2uint64(head[25:32]),
+		    byte_array2uint32(head[33:36]),
+		    byte_array2uint32(head[37:40]),
+		    byte_array2uint32(head[41:44]))
+	end
 end
 
 struct Elf64_Sym
