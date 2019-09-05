@@ -1,6 +1,6 @@
 module ELF
 
-export Elf64_Ehdr, Elf64_Shdr, IS_ELF, print_section, EI_CLASS, ELFCLASS64, EI_DATA, ELFDATA2MSB, SHT_NOBITS
+export Elf64_Ehdr, Elf64_Shdr, Elf64_Phdr, IS_ELF, print_section, EI_CLASS, ELFCLASS64, EI_DATA, ELFDATA2MSB, SHT_NOBITS
 
 const EI_CLASS = 5
 const ELFCLASS64 = UInt8(2)
@@ -10,7 +10,7 @@ const EV_CURRENT = 1
 const ELFOSABI_GNU = 4
 const ELFOSABI_LINUX = ELFOSABI_GNU
 const Elf64_Word = UInt32
-const Elf64_Sword = UInt32
+const Elf64_Sword = Int32
 const Elf64_Xword = UInt64
 const Elf64_Sxword = Int64
 const Elf64_Half = UInt16
@@ -46,22 +46,20 @@ struct Elf64_Ehdr
 	e_shstrndx::Elf64_Half
 	
 	function Elf64_Ehdr(head::Array{UInt8, 1})
-		eid = head[1:16]
-		ety = byte_array2uint16(head[17:18])
-		ema = byte_array2uint16(head[19:20])
-		eve = byte_array2uint32(head[21:24])
-		een = byte_array2uint64(head[25:32])
-		eph = byte_array2uint64(head[33:40])
-		esh = byte_array2uint64(head[41:48])
-		efl = byte_array2uint32(head[49:52])
-		eeh = byte_array2uint16(head[53:54])
-		ephe = byte_array2uint16(head[55:56])
-		ephn = byte_array2uint16(head[57:58])
-		eshe = byte_array2uint16(head[59:60])
-		eshnu = byte_array2uint16(head[61:62])
-		eshs = byte_array2uint16(head[63:64])
-		new(eid, ety, ema, eve, een, eph, esh,
-		    efl, eeh, ephe, ephn, eshe, eshnu, eshs)
+		new(head[1:16],
+		    byte_array2uint16(head[17:18]),
+		    byte_array2uint16(head[19:20]),
+		    byte_array2uint32(head[21:24]),
+		    byte_array2uint64(head[25:32]),
+		    byte_array2uint64(head[33:40]),
+		    byte_array2uint64(head[41:48]),
+		    byte_array2uint32(head[49:52]),
+		    byte_array2uint16(head[53:54]),
+		    byte_array2uint16(head[55:56]),
+		    byte_array2uint16(head[57:58]),
+		    byte_array2uint16(head[59:60]),
+		    byte_array2uint16(head[61:62]),
+		    byte_array2uint16(head[63:64]))
 	end
 end
 
@@ -76,6 +74,21 @@ struct Elf64_Shdr
 	sh_info::Elf64_Word
 	sh_addralign::Elf64_Xword
 	sh_entsize::Elf64_Xword
+
+	function Elf64_Shdr(head::Array{UInt8, 1}, off::UInt)
+		N = head[off+1:off+64]
+		new(byte_array2uint32(N[1:4]),
+		    byte_array2uint32(N[5:8]),
+		    byte_array2uint64(N[9:16]),
+		    byte_array2uint64(N[17:24]),
+		    byte_array2uint64(N[25:32]),
+		    byte_array2uint64(N[33:40]),
+		    byte_array2uint32(N[41:44]),
+		    byte_array2uint32(N[45:48]),
+		    byte_array2uint64(N[49:56]),
+		    byte_array2uint64(N[57:64]))
+	end
+
 	function Elf64_Shdr(head::Array{UInt8, 1})
 		new(byte_array2uint32(head[1:4]),
 		    byte_array2uint32(head[5:8]),
@@ -88,6 +101,7 @@ struct Elf64_Shdr
 		    byte_array2uint64(head[49:56]),
 		    byte_array2uint64(head[57:64]))
 	end
+
 end
 
 struct Elf64_Phdr
@@ -100,15 +114,16 @@ struct Elf64_Phdr
 	p_memsz::Elf64_Xword
 	p_align::Elf64_Xword
 
-	function Elf64_Phdr(head::Array{UInt8, 1})
-		new(byte_array2uint32(head[1:4]),
-		    byte_array2uint32(head[5:8]),
-		    byte_array2uint64(head[9:16]),
-		    byte_array2uint64(head[17:24]),
-		    byte_array2uint64(head[25:32]),
-		    byte_array2uint32(head[33:36]),
-		    byte_array2uint32(head[37:40]),
-		    byte_array2uint32(head[41:44]))
+	function Elf64_Phdr(head::Array{UInt8, 1}, off::UInt)
+		N = head[off+1:off+64]
+		new(byte_array2uint32(N[1:4]),
+		    byte_array2uint32(N[5:8]),
+		    byte_array2uint64(N[9:16]),
+		    byte_array2uint64(N[17:24]),
+		    byte_array2uint64(N[25:32]),
+		    byte_array2uint32(N[33:36]),
+		    byte_array2uint32(N[37:40]),
+		    byte_array2uint32(N[41:44]))
 	end
 end
 
