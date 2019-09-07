@@ -1,6 +1,6 @@
 module ELF
 
-export Elf64_Ehdr, Elf64_Shdr, Elf64_Phdr, IS_ELF, print_section, EI_CLASS, ELFCLASS64, EI_DATA, ELFDATA2MSB, SHT_NOBITS
+export Elf64_Ehdr, Elf64_Shdr, Elf64_Phdr, Elf64_Rel, Elf64_Rela, Elf64_Sym, IS_ELF, print_section, EI_CLASS, ELFCLASS64, EI_DATA, ELFDATA2MSB, SHT_NOBITS, SHT_SYMTAB, ELF64_ST_TYPE, SHT_REL, SHT_RELA, ELF64_R_SYM
 
 const EI_CLASS = 5
 const ELFCLASS64 = UInt8(2)
@@ -28,6 +28,9 @@ const ELFMAG3 = UInt8('L')
 const EIMAG4 = 4
 const ELFMAG4 = UInt8('F')
 const SHT_NOBITS = 8
+const SHT_SYMTAB = 2
+const SHT_REL = 9
+const SHT_RELA = 4
 
 struct Elf64_Ehdr
 	e_ident::Array{UInt8, 1}
@@ -134,18 +137,41 @@ struct Elf64_Sym
 	st_shndx::Elf64_Section
 	st_value::Elf64_Addr
 	st_size::Elf64_Xword
+
+	function Elf64_Sym(head::Array{UInt8, 1}, off::UInt)
+		N = head[off+1:off+24]
+		new(byte_array2uint32(N[1:4]),
+		    N[5],
+		    N[6],
+		    byte_array2uint16(N[7:8]),
+		    byte_array2uint64(N[9:16]),
+		    byte_array2uint64(N[17:24]))
+	end
 end
 
 struct Elf64_Rel
 	r_offset::Elf64_Addr
 	r_info::Elf64_Xword
+	
+	function Elf64_Rel(head::Array{UInt8, 1}, off::UInt)
+		N = head[off+1:off+16]
+		new(byte_array2uint64(N[1:8]),
+		    Int32(byte_array2uint32(N[9:12])))
+	end
 end
 
 struct Elf64_Rela
 	r_offset::Elf64_Addr
 	r_info::Elf64_Xword
 	r_addend::Elf64_Sxword
+	function Elf64_Rela(head::Array{UInt8, 1}, off::UInt)
+		N = head[off+1:off:24]
+		new(byte_array2uint64(N[1:8]),
+		    Int32(byte_array2uint32(N[9:13])),
+		    Int64(byte_array2uint64(N[14:21])))
+	end
 end
+
 
 function IS_ELF(ehdr::Elf64_Ehdr)
 	return (ehdr.e_ident[EIMAG1] == ELFMAG1 &&
@@ -153,6 +179,10 @@ function IS_ELF(ehdr::Elf64_Ehdr)
 		ehdr.e_ident[EIMAG3] == ELFMAG3 &&
 		ehdr.e_ident[EIMAG4] == ELFMAG4)
 end
+
+ELF64_ST_TYPE(val) = val & 0xf
+
+ELF64_R_SYM(i) = i >> 32
 
 function uint_convert(n::UInt32)	#UInt32 to UInt8 array
 	N::Array{UInt8, 1} = []
