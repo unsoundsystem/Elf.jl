@@ -1,6 +1,6 @@
 module ELF
 
-export Elf64_Ehdr, Elf64_Shdr, Elf64_Phdr, Elf64_Rel, Elf64_Rela, Elf64_Sym, IS_ELF, print_section, EI_CLASS, ELFCLASS64, EI_DATA, ELFDATA2MSB, SHT_NOBITS, SHT_SYMTAB, ELF64_ST_TYPE, SHT_REL, SHT_RELA, ELF64_R_SYM
+export Elf64_Ehdr, Elf64_Shdr, Elf64_Phdr, Elf64_Rel, Elf64_Rela, Elf64_Sym, IS_ELF, print_section, EI_CLASS, ELFCLASS64, EI_DATA, ELFDATA2MSB, SHT_NOBITS, SHT_SYMTAB, ELF64_ST_TYPE, SHT_REL, SHT_RELA, ELF64_R_SYM, read_name
 
 const EI_CLASS = 5
 const ELFCLASS64 = UInt8(2)
@@ -91,20 +91,6 @@ struct Elf64_Shdr
 		    byte_array2uint64(N[49:56]),
 		    byte_array2uint64(N[57:64]))
 	end
-
-	function Elf64_Shdr(head::Array{UInt8, 1})
-		new(byte_array2uint32(head[1:4]),
-		    byte_array2uint32(head[5:8]),
-		    byte_array2uint64(head[9:16]),
-		    byte_array2uint64(head[17:24]),
-		    byte_array2uint64(head[25:32]),
-		    byte_array2uint64(head[33:40]),
-		    byte_array2uint32(head[41:44]),
-		    byte_array2uint32(head[45:48]),
-		    byte_array2uint64(head[49:56]),
-		    byte_array2uint64(head[57:64]))
-	end
-
 end
 
 struct Elf64_Phdr
@@ -132,8 +118,8 @@ end
 
 struct Elf64_Sym
 	st_name::Elf64_Word
-	st_info::Cuchar
-	st_other::Cuchar
+	st_info::UInt8
+	st_other::UInt8
 	st_shndx::Elf64_Section
 	st_value::Elf64_Addr
 	st_size::Elf64_Xword
@@ -141,8 +127,8 @@ struct Elf64_Sym
 	function Elf64_Sym(head::Array{UInt8, 1}, off::UInt)
 		N = head[off+1:off+24]
 		new(byte_array2uint32(N[1:4]),
-		    N[5],
 		    N[6],
+		    N[5],
 		    byte_array2uint16(N[7:8]),
 		    byte_array2uint64(N[9:16]),
 		    byte_array2uint64(N[17:24]))
@@ -156,7 +142,7 @@ struct Elf64_Rel
 	function Elf64_Rel(head::Array{UInt8, 1}, off::UInt)
 		N = head[off+1:off+16]
 		new(byte_array2uint64(N[1:8]),
-		    Int32(byte_array2uint32(N[9:12])))
+		    byte_array2uint64(N[9:16]))
 	end
 end
 
@@ -167,8 +153,8 @@ struct Elf64_Rela
 	function Elf64_Rela(head::Array{UInt8, 1}, off::UInt)
 		N = head[off+1:off:24]
 		new(byte_array2uint64(N[1:8]),
-		    Int32(byte_array2uint32(N[9:13])),
-		    Int64(byte_array2uint64(N[14:21])))
+		    byte_array2uint64(N[9:16]),
+		    Int64(byte_array2uint64(N[17:24])))
 	end
 end
 
@@ -182,67 +168,41 @@ end
 
 ELF64_ST_TYPE(val) = val & 0xf
 
-ELF64_R_SYM(i) = i >> 32
+ELF64_R_SYM(i) = i >>> 32
 
-function uint_convert(n::UInt32)	#UInt32 to UInt8 array
-	N::Array{UInt8, 1} = []
-	for i in 0:3
-		push!(N, convert(UInt8, (n >>> 8i) & 0xff))
-	end
-	return N[end:-1:1]
-end
-
-function uint_convert(n::UInt64)	#UInt64 to UInt8 array
-	N::Array{UInt8, 1} = []
-	for i in 0:7
-		push!(N, convert(UInt8, (n >>> 8i) & 0xff))
-	end
-	return N[end:-1:1]
-end
-
-function uint_convert(n::UInt16)	#UInt16 to UInt8 array
-	N::Array{UInt8, 1} = []
-	push!(N, convert(UInt8, n & 0xff))
-	push!(N, convert(UInt8, (n >>> 8) & 0xff))
-	return N[end:-1:1]
-end
-
-function byte_array2uint32(A::Array{UInt8, 1})	#UInt8 array to UInt32
-	N = A #[end:-1:1]
+function byte_array2uint32(N::Array{UInt8, 1})	#UInt8 array to UInt32
 	while length(N) % 4 != 0
 		prepend!(N, 0x00)
 	end
 	return convert(UInt32, reinterpret(UInt32, N)[1])
 end
 
-function byte_array2uint64(A::Array{UInt8, 1})	#UInt8 array to UInt64
-	N = A #[end:-1:1]
+function byte_array2uint64(N::Array{UInt8, 1})	#UInt8 array to UInt64
 	while length(N) % 8 != 0
 		prepend!(N, 0x00)
 	end
 	return convert(UInt64, reinterpret(UInt64, N)[1])
 end
 
-function byte_array2uint16(A::Array{UInt8, 1})	#UInt8 array to UInt16
-	N = A #[end:-1:1]
+function byte_array2uint16(N::Array{UInt8, 1})	#UInt8 array to UInt16
 	while length(N) % 2 != 0
 		prepend!(N, 0x00)
 	end
 	return convert(UInt16, reinterpret(UInt16, N)[1])
 end
 
-function print_section(A::Array{UInt8, 1}, off, num::Int64)
-	for i in 0:num
-		isnull = false
-		while !isnull
-			if A[off] == 0x00
-				print("\n")
-				isnull = true
-			end
-			print(Char(A[off]))
-			off += 1
+function read_name(head::Vector{UInt8}, off::UInt)
+	isnull = false
+	sname = ""
+	while !isnull
+		if head[off] == 0x00
+			isnull = true
+			continue
 		end
+		sname *= Char(head[off])
+		off += 1
 	end
+	return sname
 end
 
 end # module
