@@ -147,17 +147,17 @@ struct Elf64_Rel
 	end
 end
 
-struct Elf64_Rela
-	r_offset::Elf64_Addr
-	r_info::Elf64_Xword
-	r_addend::Elf64_Sxword
-	function Elf64_Rela(head::Vector{UInt8}, off::UInt)
-		N = head[off+1:off:24]
-		new(byte_array2uint64(N[1:8]),
-		    byte_array2uint64(N[9:16]),
-		    Int64(byte_array2uint64(N[17:24])))
-	end
-end
+# struct Elf64_Rela
+	# r_offset::Elf64_Addr
+	# r_info::Elf64_Xword
+	# r_addend::Elf64_Sxword
+	# function Elf64_Rela(head::Vector{UInt8}, off::UInt)
+		# N = head[off+1:off:24]
+		# new(byte_array2uint64(N[1:8]),
+		    # byte_array2uint64(N[9:16]),
+		    # Int64(byte_array2uint64(N[17:24])))
+	# end
+# end
 
 
 function IS_ELF(ehdr::Elf64_Ehdr)
@@ -178,12 +178,6 @@ function convert(T::Type{UInt32}, N::Vector{UInt8})
 	return reinterpret(UInt32, N)[1]
 end
 
-# function byte_array2uint32(N::Vector{UInt8})	#UInt8 array to UInt32
-	# while length(N) % 4 != 0
-		# prepend!(N, 0x00)
-	# end
-	# return convert(UInt32, reinterpret(UInt32, N)[1])
-# end
 function convert(T::Type{UInt64}, N::Vector{UInt8})
 	while length(N) % 8 != 0
 		prepend!(N, 0x00)
@@ -191,25 +185,12 @@ function convert(T::Type{UInt64}, N::Vector{UInt8})
 	return reinterpret(UInt64, N)[1]
 end
 
-# function byte_array2uint64(N::Vector{UInt8})	#UInt8 array to UInt64
-	# while length(N) % 8 != 0
-		# prepend!(N, 0x00)
-	# end
-	# return convert(UInt64, reinterpret(UInt64, N)[1])
-# end
 function convert(T::Type{UInt16}, N::Vector{UInt8})
 	while length(N) % 2 != 0
 		prepend!(N, 0x00)
 	end
 	return reinterpret(UInt16, N)[1]
 end
-
-# function byte_array2uint16(N::Vector{UInt8})	#UInt8 array to UInt16
-	# while length(N) % 2 != 0
-		# prepend!(N, 0x00)
-	# end
-	# return convert(UInt16, reinterpret(UInt16, N)[1])
-# end
 
 function read_name(head::Vector{UInt8}, off::UInt)
 	isnull = false
