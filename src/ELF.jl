@@ -1,4 +1,5 @@
 module ELF
+using Base
 
 export Elf64_Ehdr, Elf64_Shdr, Elf64_Phdr, Elf64_Rel, Elf64_Rela, Elf64_Sym, IS_ELF, print_section, EI_CLASS, ELFCLASS64, EI_DATA, ELFDATA2MSB, SHT_NOBITS, SHT_SYMTAB, ELF64_ST_TYPE, SHT_REL, SHT_RELA, ELF64_R_SYM, read_name
 
@@ -33,7 +34,7 @@ const SHT_REL = 9
 const SHT_RELA = 4
 
 struct Elf64_Ehdr
-	e_ident::Array{UInt8, 1}
+	e_ident::Vector{UInt8}
 	e_type::Elf64_Half
 	e_machine::Elf64_Half
 	e_version::Elf64_Word
@@ -48,21 +49,21 @@ struct Elf64_Ehdr
 	e_shnum::Elf64_Half
 	e_shstrndx::Elf64_Half
 	
-	function Elf64_Ehdr(head::Array{UInt8, 1})
+	function Elf64_Ehdr(head::Vector{UInt8})
 		new(head[1:16],
-		    byte_array2uint16(head[17:18]),
-		    byte_array2uint16(head[19:20]),
-		    byte_array2uint32(head[21:24]),
-		    byte_array2uint64(head[25:32]),
-		    byte_array2uint64(head[33:40]),
-		    byte_array2uint64(head[41:48]),
-		    byte_array2uint32(head[49:52]),
-		    byte_array2uint16(head[53:54]),
-		    byte_array2uint16(head[55:56]),
-		    byte_array2uint16(head[57:58]),
-		    byte_array2uint16(head[59:60]),
-		    byte_array2uint16(head[61:62]),
-		    byte_array2uint16(head[63:64]))
+		    convert(UInt16, head[17:18]),
+		    convert(UInt16, head[19:20]),
+		    convert(UInt32, head[21:24]),
+		    convert(UInt64, head[25:32]),
+		    convert(UInt64, head[33:40]),
+		    convert(UInt64, head[41:48]),
+		    convert(UInt32, head[49:52]),
+		    convert(UInt16, head[53:54]),
+		    convert(UInt16, head[55:56]),
+		    convert(UInt16, head[57:58]),
+		    convert(UInt16, head[59:60]),
+		    convert(UInt16, head[61:62]),
+		    convert(UInt16, head[63:64]))
 	end
 end
 
@@ -78,18 +79,18 @@ struct Elf64_Shdr
 	sh_addralign::Elf64_Xword
 	sh_entsize::Elf64_Xword
 
-	function Elf64_Shdr(head::Array{UInt8, 1}, off::UInt)
+	function Elf64_Shdr(head::Vector{UInt8}, off::UInt)
 		N = head[off+1:off+64]
-		new(byte_array2uint32(N[1:4]),
-		    byte_array2uint32(N[5:8]),
-		    byte_array2uint64(N[9:16]),
-		    byte_array2uint64(N[17:24]),
-		    byte_array2uint64(N[25:32]),
-		    byte_array2uint64(N[33:40]),
-		    byte_array2uint32(N[41:44]),
-		    byte_array2uint32(N[45:48]),
-		    byte_array2uint64(N[49:56]),
-		    byte_array2uint64(N[57:64]))
+		new(convert(UInt32, N[1:4]),
+		    convert(UInt32, N[5:8]),
+		    convert(UInt64, N[9:16]),
+		    convert(UInt64, N[17:24]),
+		    convert(UInt64, N[25:32]),
+		    convert(UInt64, N[33:40]),
+		    convert(UInt32, N[41:44]),
+		    convert(UInt32, N[45:48]),
+		    convert(UInt64, N[49:56]),
+		    convert(UInt64, N[57:64]))
 	end
 end
 
@@ -103,16 +104,16 @@ struct Elf64_Phdr
 	p_memsz::Elf64_Xword
 	p_align::Elf64_Xword
 
-	function Elf64_Phdr(head::Array{UInt8, 1}, off::UInt)
+	function Elf64_Phdr(head::Vector{UInt8}, off::UInt)
 		N = head[off+1:off+64]
-		new(byte_array2uint32(N[1:4]),
-		    byte_array2uint32(N[5:8]),
-		    byte_array2uint64(N[9:16]),
-		    byte_array2uint64(N[17:24]),
-		    byte_array2uint64(N[25:32]),
-		    byte_array2uint32(N[33:36]),
-		    byte_array2uint32(N[37:40]),
-		    byte_array2uint32(N[41:44]))
+		new(convert(UInt32, N[1:4]),
+		    convert(UInt32, N[5:8]),
+		    convert(UInt64, N[9:16]),
+		    convert(UInt64, N[17:24]),
+		    convert(UInt64, N[25:32]),
+		    convert(UInt32, N[33:36]),
+		    convert(UInt32, N[37:40]),
+		    convert(UInt32, N[41:44]))
 	end
 end
 
@@ -124,14 +125,14 @@ struct Elf64_Sym
 	st_value::Elf64_Addr
 	st_size::Elf64_Xword
 
-	function Elf64_Sym(head::Array{UInt8, 1}, off::UInt)
+	function Elf64_Sym(head::Vector{UInt8}, off::UInt)
 		N = head[off+1:off+24]
-		new(byte_array2uint32(N[1:4]),
+		new(convert(UInt32, N[1:4]),
 		    N[6],
 		    N[5],
-		    byte_array2uint16(N[7:8]),
-		    byte_array2uint64(N[9:16]),
-		    byte_array2uint64(N[17:24]))
+		    convert(UInt16, N[7:8]),
+		    convert(UInt64, N[9:16]),
+		    convert(UInt64, N[17:24]))
 	end
 end
 
@@ -139,10 +140,10 @@ struct Elf64_Rel
 	r_offset::Elf64_Addr
 	r_info::Elf64_Xword
 	
-	function Elf64_Rel(head::Array{UInt8, 1}, off::UInt)
+	function Elf64_Rel(head::Vector{UInt8}, off::UInt)
 		N = head[off+1:off+16]
-		new(byte_array2uint64(N[1:8]),
-		    byte_array2uint64(N[9:16]))
+		new(convert(UInt64, N[1:8]),
+		    convert(UInt64, N[9:16]))
 	end
 end
 
@@ -150,7 +151,7 @@ struct Elf64_Rela
 	r_offset::Elf64_Addr
 	r_info::Elf64_Xword
 	r_addend::Elf64_Sxword
-	function Elf64_Rela(head::Array{UInt8, 1}, off::UInt)
+	function Elf64_Rela(head::Vector{UInt8}, off::UInt)
 		N = head[off+1:off:24]
 		new(byte_array2uint64(N[1:8]),
 		    byte_array2uint64(N[9:16]),
@@ -170,26 +171,45 @@ ELF64_ST_TYPE(val) = val & 0xf
 
 ELF64_R_SYM(i) = i >>> 32
 
-function byte_array2uint32(N::Array{UInt8, 1})	#UInt8 array to UInt32
+function convert(T::Type{UInt32}, N::Vector{UInt8})
 	while length(N) % 4 != 0
 		prepend!(N, 0x00)
 	end
-	return convert(UInt32, reinterpret(UInt32, N)[1])
+	return reinterpret(UInt32, N)[1]
 end
 
-function byte_array2uint64(N::Array{UInt8, 1})	#UInt8 array to UInt64
+# function byte_array2uint32(N::Vector{UInt8})	#UInt8 array to UInt32
+	# while length(N) % 4 != 0
+		# prepend!(N, 0x00)
+	# end
+	# return convert(UInt32, reinterpret(UInt32, N)[1])
+# end
+function convert(T::Type{UInt64}, N::Vector{UInt8})
 	while length(N) % 8 != 0
 		prepend!(N, 0x00)
 	end
-	return convert(UInt64, reinterpret(UInt64, N)[1])
+	return reinterpret(UInt64, N)[1]
 end
 
-function byte_array2uint16(N::Array{UInt8, 1})	#UInt8 array to UInt16
+# function byte_array2uint64(N::Vector{UInt8})	#UInt8 array to UInt64
+	# while length(N) % 8 != 0
+		# prepend!(N, 0x00)
+	# end
+	# return convert(UInt64, reinterpret(UInt64, N)[1])
+# end
+function convert(T::Type{UInt16}, N::Vector{UInt8})
 	while length(N) % 2 != 0
 		prepend!(N, 0x00)
 	end
-	return convert(UInt16, reinterpret(UInt16, N)[1])
+	return reinterpret(UInt16, N)[1]
 end
+
+# function byte_array2uint16(N::Vector{UInt8})	#UInt8 array to UInt16
+	# while length(N) % 2 != 0
+		# prepend!(N, 0x00)
+	# end
+	# return convert(UInt16, reinterpret(UInt16, N)[1])
+# end
 
 function read_name(head::Vector{UInt8}, off::UInt)
 	isnull = false
