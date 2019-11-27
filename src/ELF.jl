@@ -192,18 +192,4 @@ function convert(T::Type{UInt16}, N::Vector{UInt8})
 	return reinterpret(UInt16, N)[1]
 end
 
-function read_name(head::Vector{UInt8}, off::UInt)
-	isnull = false
-	sname = ""
-	while !isnull
-		if head[off] == 0x00
-			isnull = true
-			continue
-		end
-		sname *= Char(head[off])
-		off += 1
-	end
-	return sname
-end
-
 end # module
