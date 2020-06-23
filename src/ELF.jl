@@ -1,4 +1,4 @@
-module ELF
+module Elf
 using Base
 using StaticArrays
 using DataStructures
@@ -270,11 +270,6 @@ A type represents 64bit ELF relocatable symbol.
 struct Elf64_Rel
     r_offset::Elf64_Addr
     r_info::Elf64_Xword
-
-    # function Elf64_Rel(head::Vector{UInt8}, off::UInt)
-        # N = head[(off + 1):(off + 16)]
-        # new(convert(UInt64, N[1:8]), convert(UInt64, N[9:16]))
-    # end
 end
 
 Elf64_Rel(bin::Vector{UInt8}, off::UInt) =
