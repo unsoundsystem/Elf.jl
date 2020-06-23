@@ -2,3 +2,7 @@ name = "ELF"
 uuid = "c8afdff0-e808-4610-bc91-d3b0c4a6d0f3"
 authors = ["sasuseso <sinai471530@gmail.com>"]
 version = "0.1.0"
+
+[deps]
+DataStructures = "864edb3b-99cc-5e75-8d2d-829cb0a9cfe8"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"

@@ -1,2 +1,5 @@
 /*.h
+/*.c
+/*.o
+/a.out
 /sample/builddir
