@@ -1,7 +1,6 @@
 module Elf
 using Base
-using StaticArrays
-using DataStructures
+using StaticArrays, DataStructures, Match
 
 export Elf64_Ehdr,
     Elf64_Shdr,
@@ -22,11 +21,12 @@ export Elf64_Ehdr,
     ELF64_R_SYM,
     read_name,
     iself,
-    isclass,
-    isendian,
+    elfclass,
+    endian,
     sections,
     segments,
-    symbols
+    symbols,
+    elfosabi
 
 const EI_CLASS = 5
 const ELFCLASS64 = UInt8(2)
@@ -99,9 +99,62 @@ true
 """
 iself(ehdr::Elf64_Ehdr) = ehdr.e_ident[begin:4] == [ELFMAG1, ELFMAG2, ELFMAG3, ELFMAG4]
 
-isclass(ehdr::Elf64_Ehdr, magic::UInt8) = ehdr.e_ident[EI_CLASS] == magic
+function elfclass(ehdr::Elf64_Ehdr)
+    @match ehdr.e_ident[EI_CLASS] begin
+        0 => error("Invalid class.")  # ELFCLASSNONE
+        1 => :x32  # ELFCLASS32
+        2 => :x64  # ELFCLASS64
+        _ => error("Unexpected value.")
+    end
+end
 
-isendian(ehdr::Elf64_Ehdr, endian::UInt64) = ehdr.e_ident[EI_DATA] == endian
+function endian(ehdr::Elf64_Ehdr)
+    @match ehdr.e_ident[EI_DATA] begin
+        0 => error("Invalid data encoding.") # ELFDATANONE
+        1 => :LittleEndian # ELFDATA2LSB
+        2 => :BigEndian # ELFDATA2MSB
+        _ => error("Unexpected value.")
+    end
+end
+
+function elfversion(ehdr::Elf64_Ehdr)
+    @match ehdr.e_ident[7] begin
+        0 => error("Invalid ELF version.")
+        1 => :Current
+    end
+end
+
+function elfosabi(ehdr::Elf64_Ehdr)
+    arch = @match ehdr.e_ident[8] begin
+        0 => :SystemV
+        1 => :HP_UX
+        2 => :NetBSD
+        3 => :Linux
+        6 => :Solaris
+        7 => :AIX
+        8 => :Irix
+        9 => :FreeBSD
+        10 => :TRU64
+        11 => :Modesto
+        12 => :OpenBSD
+        64 => :ARM
+        97 => :ARM_EABI
+        255 => :Standalone
+        _ => error("Unexpected architecture.")
+    end
+
+    (arch = arch, version = ehdr.e_ident[9])
+end
+
+function elftype(ehdr::Elf64_Ehdr)
+    @match ehdr.e_type begin
+        1 => :Rel
+        2 => :Exec
+        3 => :Dyn
+        4 => :Core
+        _ => error("Unknown ELF filetype.")
+    end
+end
 
 """
     Elf64_Shdr
