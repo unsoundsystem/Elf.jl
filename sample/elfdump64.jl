@@ -1,5 +1,5 @@
 #!/bin/julia
-using ELF
+using Elf
 
 function main()
     isempty(ARGS) && error("No file specifed.")
@@ -10,9 +10,9 @@ function main()
 
     !iself(ehdr) && error("Not an ELF binary.")
 
-    !isclass(ehdr, ELFCLASS64) && error("Unknown class.")
+    !(elfclass(ehdr) == :x64) && error("Unknown class.")
 
-    !isendian(ehdr, ELFDATA2MSB) && error("Unknown endian.")
+    !(endian(ehdr) == :LittleEndian) && error("Unknown endian.")
 
     # Print Section Names
     println("Sections:")

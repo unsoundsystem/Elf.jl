@@ -1,0 +1,69 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_OUTPUT_FILESEP	slash	/slash or backslash/
+!_TAG_OUTPUT_MODE	u-ctags	/u-ctags or e-ctags/
+!_TAG_PROGRAM_AUTHOR	Universal Ctags Team	//
+!_TAG_PROGRAM_NAME	Universal Ctags	/Derived from Exuberant Ctags/
+!_TAG_PROGRAM_URL	https://ctags.io/	/official site/
+!_TAG_PROGRAM_VERSION	0.0.0	/a3c87ab5/
+EIMAG1	src/constants.jl	/^const EIMAG1 = 1$/;"	v
+EIMAG2	src/constants.jl	/^const EIMAG2 = 2$/;"	v
+EIMAG3	src/constants.jl	/^const EIMAG3 = 3$/;"	v
+EIMAG4	src/constants.jl	/^const EIMAG4 = 4$/;"	v
+EI_CLASS	src/constants.jl	/^const EI_CLASS = 5$/;"	v
+EI_DATA	src/constants.jl	/^const EI_DATA = 6$/;"	v
+EI_NIDENT	src/constants.jl	/^const EI_NIDENT = 16$/;"	v
+EI_OSABI	src/constants.jl	/^const EI_OSABI = 8$/;"	v
+EI_VERSION	src/constants.jl	/^const EI_VERSION = 7$/;"	v
+ELF64_R_SYM	src/types.jl	/^ELF64_R_SYM(i) = i >>> 32$/;"	f
+ELF64_ST_TYPE	src/types.jl	/^ELF64_ST_TYPE(val) = val & 0xf$/;"	f
+ELFMAG1	src/constants.jl	/^const ELFMAG1 = 0x7f$/;"	v
+ELFMAG2	src/constants.jl	/^const ELFMAG2 = UInt8('E')$/;"	v
+ELFMAG3	src/constants.jl	/^const ELFMAG3 = UInt8('L')$/;"	v
+ELFMAG4	src/constants.jl	/^const ELFMAG4 = UInt8('F')$/;"	v
+Elf	src/Elf.jl	/^module Elf$/;"	f
+Elf64_Addr	src/types.jl	/^const Elf64_Addr = UInt64$/;"	v
+Elf64_Chdr	src/types.jl	/^Elf64_Chdr(bin::Vector{UInt8}) = pointer(bin, off + 1) |> Ptr{Elf64_Chdr} |> unsafe_load$/;"	f
+Elf64_Chdr	src/types.jl	/^struct Elf64_Chdr$/;"	f
+Elf64_Ehdr	src/types.jl	/^Elf64_Ehdr(bin::Vector{UInt8}) = pointer(bin) |> Ptr{Elf64_Ehdr} |> unsafe_load$/;"	f
+Elf64_Ehdr	src/types.jl	/^struct Elf64_Ehdr$/;"	f
+Elf64_Half	src/types.jl	/^const Elf64_Half = UInt16$/;"	v
+Elf64_Off	src/types.jl	/^const Elf64_Off = UInt64$/;"	v
+Elf64_Phdr	src/types.jl	/^Elf64_Phdr(bin::Vector{UInt8}, off::UInt) =$/;"	f
+Elf64_Phdr	src/types.jl	/^struct Elf64_Phdr$/;"	f
+Elf64_Rel	src/types.jl	/^Elf64_Rel(bin::Vector{UInt8}, off::UInt) =$/;"	f
+Elf64_Rel	src/types.jl	/^struct Elf64_Rel$/;"	f
+Elf64_Rela	src/types.jl	/^Elf64_Rela(bin::Vector{UInt8}, off::UInt) =$/;"	f
+Elf64_Rela	src/types.jl	/^struct Elf64_Rela$/;"	f
+Elf64_Section	src/types.jl	/^const Elf64_Section = UInt16$/;"	v
+Elf64_Shdr	src/types.jl	/^Elf64_Shdr(bin::Vector{UInt8}, off::UInt) =$/;"	f
+Elf64_Shdr	src/types.jl	/^struct Elf64_Shdr$/;"	f
+Elf64_Sword	src/types.jl	/^const Elf64_Sword = Int32$/;"	v
+Elf64_Sxword	src/types.jl	/^const Elf64_Sxword = Int64$/;"	v
+Elf64_Sym	src/types.jl	/^Elf64_Sym(bin::Vector{UInt8}, off::UInt) =$/;"	f
+Elf64_Sym	src/types.jl	/^struct Elf64_Sym$/;"	f
+Elf64_SymInfo	src/types.jl	/^Elf64_SymInfo(bin::Vector{UInt8}) =$/;"	f
+Elf64_SymInfo	src/types.jl	/^struct Elf64_SymInfo$/;"	f
+Elf64_Versym	src/types.jl	/^const Elf64_Versym = Elf64_Half$/;"	v
+Elf64_Word	src/types.jl	/^const Elf64_Word = UInt32$/;"	v
+Elf64_Xword	src/types.jl	/^const Elf64_Xword = UInt64$/;"	v
+SHT_NOBITS	src/constants.jl	/^const SHT_NOBITS = 8$/;"	v
+SHT_REL	src/constants.jl	/^const SHT_REL = 9$/;"	v
+SHT_RELA	src/constants.jl	/^const SHT_RELA = 4$/;"	v
+SHT_SYMTAB	src/constants.jl	/^const SHT_SYMTAB = 2$/;"	v
+elfclass	src/Elf.jl	/^function elfclass(ehdr::Elf64_Ehdr)$/;"	f
+elfosabi	src/Elf.jl	/^function elfosabi(ehdr::Elf64_Ehdr)$/;"	f
+elftype	src/Elf.jl	/^function elftype(ehdr::Elf64_Ehdr)$/;"	f
+elfversion	src/Elf.jl	/^function elfversion(ehdr::Elf64_Ehdr)$/;"	f
+endian	src/Elf.jl	/^function endian(ehdr::Elf64_Ehdr)$/;"	f
+iself	src/Elf.jl	/^iself(ehdr::Elf64_Ehdr) = ehdr.e_ident[begin:4] == [ELFMAG1, ELFMAG2, ELFMAG3, ELFMAG4]$/;"	f
+main	sample/elfdump64.jl	/^function main()$/;"	f
+sections	src/Elf.jl	/^function sections(bin::Vector{UInt8})$/;"	f
+segments	src/Elf.jl	/^function segments(bin::Vector{UInt8})$/;"	f
+st_info_bind	src/types.jl	/^st_info_bind(st_info::UInt8) = st_info >>> 4$/;"	f
+st_info_info	src/types.jl	/^st_info_info(bind::UInt8, type::UInt8) = ((bind << 4) + (type & 0xf))$/;"	f
+st_info_type	src/types.jl	/^st_info_type(st_info::UInt8) = st_info & 0xf$/;"	f
+st_visibility	src/types.jl	/^st_visibility(st_other::UInt8) = st_other & 0x3$/;"	f
+symbols	src/Elf.jl	/^function symbols(bin::Vector{UInt8})$/;"	f
+unsafe_string	src/Elf.jl	/^                unsafe_string(pointer(bin, str.sh_offset + symp.st_name + 1)) => relp,$/;"	f
+unsafe_string	src/Elf.jl	/^                unsafe_string(pointer(bin, str.sh_offset + symp.st_name + 1)) => symp,$/;"	f
