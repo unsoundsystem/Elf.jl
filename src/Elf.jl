@@ -46,6 +46,12 @@ function endian(ehdr::Elf64_Ehdr)
     end
 end
 
+"""
+    elfversion(ehdr::Elf64_Ehdr) -> :Current
+
+If binary has valid ELF version, returns symbol :Current.
+"""
+
 function elfversion(ehdr::Elf64_Ehdr)
     @match ehdr.e_ident[EI_VERSION] begin
         0 => error("Invalid ELF version.")
