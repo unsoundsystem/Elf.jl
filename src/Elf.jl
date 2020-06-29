@@ -37,6 +37,12 @@ function elfclass(ehdr::Elf64_Ehdr)
     end
 end
 
+"""
+    endian(ehdr::Elf64_Ehdr) -> Symbol
+
+Return symbol represets endian(:LittleEndian, :BigEndian). If invalid binary represetation error will occur.
+"""
+
 function endian(ehdr::Elf64_Ehdr)
     @match ehdr.e_ident[EI_DATA] begin
         0 => error("Invalid data encoding.") # ELFDATANONE
@@ -47,7 +53,7 @@ function endian(ehdr::Elf64_Ehdr)
 end
 
 """
-    elfversion(ehdr::Elf64_Ehdr) -> :Current
+    elfversion(ehdr::Elf64_Ehdr) -> Symbol
 
 If binary has valid ELF version, returns symbol :Current.
 """
