@@ -1,22 +1,7 @@
 export EI_CLASS,
-    EHClass,
     EI_DATA,
-    EHEndian,
     EI_VERSION,
-    EHVersion,
     EI_OSABI,
-    EHOsAbi,
-    EHType,
-    EHMachine,
-    SHName,
-    SHFlags,
-    CHType,
-    SymInfoBT,
-    SymInfoFlags,
-    SymInfoVersion,
-    STBind,
-    STType,
-    STVisibility,
     ELFMAG1,
     ELFMAG2,
     ELFMAG3,
@@ -24,28 +9,54 @@ export EI_CLASS,
 
 include("./types.jl")
 
+macro enum_export(T, syms...)
+    if T isa Symbol
+        Ttype = typeof(T)
+        esc(quote
+            @enum $T $(syms...)
+            export $T
+            $([:(export $sym) for sym in syms]...)
+        end)
+    elseif (T.head === :(::) && T isa Expr && length(T.args) == 2 && T.args[1] isa Symbol)
+        if eltype(syms) == Expr && length(syms) == 1
+            vals = filter(x -> x isa Expr, syms[1].args)
+            esc(quote
+                @enum $(T.args[1])::$(T.args[2]) $(syms...)
+                export $(T.args[1])
+                $([:(export $(sym.args[1])) for sym in vals]...)
+            end)
+        else
+            esc(quote
+                @enum $(T.args[1])::$(T.args[2]) $(syms...)
+                export $(T.args[1])
+                $([:(export $sym) for sym in syms]...)
+            end)
+        end
+    end
+end
+
 const EI_CLASS = 5
-@enum EHClass::UInt8 begin
+@enum_export EHClass::UInt8 begin
     ELFCLASSNONE = 0
     ELFCLASS32 = 1
     ELFCLASS64 = 2
 end
 
 const EI_DATA = 6
-@enum EHEndian::UInt8 begin
+@enum_export EHEndian::UInt8 begin
     ELFDATANONE = 0
     ELFDATA2MSB = 1
     ELFDATA2LSB = 2
 end
 
 const EI_VERSION = 7
-@enum EHVersion::UInt8 begin
+@enum_export EHVersion::UInt8 begin
     EV_NONE = 0
     EV_CURRENT = 1
 end
 
 const EI_OSABI = 8
-@enum EHOsAbi::UInt8 begin
+@enum_export EHOsAbi::UInt8 begin
     ELFOSABI_SYSV = 0
     ELFOSABI_HPUX = 1
     ELFOSABI_NETBSD = 2
@@ -62,7 +73,7 @@ const EI_OSABI = 8
     ELFOSABI_STANDALONE = 255
 end
 
-@enum EHType::Elf64_Half begin
+@enum_export EHType::Elf64_Half begin
     ET_NONE = 0
     ET_REL = 1
     ET_EXEC = 2
@@ -76,7 +87,7 @@ end
 end
 
 # for e_machine in Ehdr
-@enum EHMachine::Elf64_Half begin
+@enum_export EHMachine::Elf64_Half begin
     EM_NONE = 0
     EM_M32 = 1
     EM_SPARC = 2
@@ -269,7 +280,7 @@ const EIMAG4 = 4
 const ELFMAG4 = UInt8('F')
 
 # for sh_name in Shdr
-@enum SHName::UInt32 begin
+@enum_export SHName::UInt32 begin
     SHN_UNDEF = 0
     SHN_LORESERVE = 0xff00
     # SHN_LOPROC = 0xff00
@@ -285,7 +296,7 @@ const ELFMAG4 = UInt8('F')
 end
 
 # for sh_type in Shdr
-@enum SHType::UInt32 begin
+@enum_export SHType::UInt32 begin
     SHT_NULL = 0
     SHT_PROGBITS = 1
     SHT_SYMTAB = 2
@@ -325,7 +336,7 @@ end
 end
 
 # for sh_flags in Shdr
-@enum SHFlags::UInt32 begin
+@enum_export SHFlags::UInt32 begin
     SHF_WRITE = (1 << 0)
     SHF_ALLOC = (1 << 1)
     SHF_EXECINSTR = (1 << 2)
@@ -343,7 +354,7 @@ end
     SHF_EXCLUDE = (1 << 31)
 end
 
-@enum CHType::UInt32 begin
+@enum_export CHType::UInt32 begin
     ELFCOMPRESS_ZLIB = 1
     ELFCOMPRESS_LOOS = 0x60000000
     ELFCOMPRESS_HIOS = 0x6fffffff
@@ -352,27 +363,27 @@ end
 end
 
 # for si_boundto
-@enum SymInfoBT::UInt16 begin
+@enum_export SymInfoBT::UInt16 begin
     SYMINFO_BT_SELF = 0xffff
     SYMINFO_BT_PARENT = 0xfffe
     SYMINFO_BT_LOWRESERVE = 0xff00
 end
 
 # for si_flags
-@enum SymInfoFlags::UInt16 begin
+@enum_export SymInfoFlags::UInt16 begin
     SYMINFO_FLG_DIRECT = 0x0001
     SYMINFO_FLG_PASSTHRU = 0x0002
     SYMINFO_FLG_COPY = 0x0004
     SYMINFO_FLG_LAZYLOAD = 0x0008
 end
 
-@enum SymInfoVersion::UInt8 begin
+@enum_export SymInfoVersion::UInt8 begin
     SYMINFO_NONE
     SYMINFO_CURRENT
 end
 
 # for st_info
-@enum STBind::UInt8 begin
+@enum_export STBind::UInt8 begin
     STB_LOCAL = 0 #  Local symbol
     STB_GLOBAL = 1 #  Global symbol
     STB_WEAK = 2 #  Weak symbol
@@ -386,7 +397,7 @@ end
 
 # for st_info
 
-@enum STType::UInt8 begin
+@enum_export STType::UInt8 begin
     STT_NOTYPE = 0 #  Symbol type is unspecified
     STT_OBJECT = 1 #  Symbol is a data object
     STT_FUNC = 2 #  Symbol is a code object
@@ -403,7 +414,7 @@ end
 end
 
 # for st_other
-@enum STVisibility::UInt8 begin
+@enum_export STVisibility::UInt8 begin
     STV_DEFAULT = 0 #  Default symbol visibility rules
     STV_INTERNAL = 1 #  Processor specific hidden class
     STV_HIDDEN = 2 #  Sym unavailable in other modules
