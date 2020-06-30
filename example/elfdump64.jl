@@ -10,9 +10,9 @@ function main()
 
     !iself(ehdr) && error("Not an ELF binary.")
 
-    !(elfclass(ehdr) == :x64) && error("Unknown class.")
+    !(elfclass(ehdr) == ELFCLASS64) && error("Unknown class.")
 
-    !(endian(ehdr) == :LittleEndian) && error("Unknown endian.")
+    !(endian(ehdr) == ELFDATA2MSB) && error("Unknown endian.")
 
     # Print Section Names
     println("Sections:")

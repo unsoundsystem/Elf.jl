@@ -1,6 +1,6 @@
 module Elf
 using Base
-using StaticArrays, DataStructures, Match
+using StaticArrays, DataStructures
 
 export iself, elfclass, endian, sections, segments, symbols, elfosabi
 include("./constants.jl")
@@ -24,76 +24,59 @@ true
 iself(ehdr::Elf64_Ehdr) = ehdr.e_ident[begin:4] == [ELFMAG1, ELFMAG2, ELFMAG3, ELFMAG4]
 
 """
-    elfclass(ehdr::Elf64_Ehdr) -> Symbol
+    elfclass(ehdr::Elf64_Ehdr) -> EHClass
 
-Detrmines ELF class(64bit or 32bit) if invalid error will occur. Return symbol :x64 or :x32.
+Detrmines ELF class(64bit or 32bit) if invalid class error will occur.
 """
 function elfclass(ehdr::Elf64_Ehdr)
-    @match ehdr.e_ident[EI_CLASS] begin
-        0 => error("Invalid class.")  # ELFCLASSNONE
-        1 => :x32  # ELFCLASS32
-        2 => :x64  # ELFCLASS64
-        _ => error("Unexpected value.")
+    try
+        EHClass(ehdr.e_ident[EI_CLASS])
+    catch
+        error("Invalid class.")
     end
 end
 
 """
-    endian(ehdr::Elf64_Ehdr) -> Symbol
+    endian(ehdr::Elf64_Ehdr) -> EHEndian
 
-Return symbol represets endian(:LittleEndian, :BigEndian). If invalid binary represetation error will occur.
+Detrmines ELF binary endian. Returns enum represents endian. If invalid error will occur.
 """
 
 function endian(ehdr::Elf64_Ehdr)
-    @match ehdr.e_ident[EI_DATA] begin
-        0 => error("Invalid data encoding.") # ELFDATANONE
-        1 => :LittleEndian # ELFDATA2LSB
-        2 => :BigEndian # ELFDATA2MSB
-        _ => error("Unexpected value.")
+    try
+        EHEndian(ehdr.e_ident[EI_DATA])
+    catch
+        error("Invalid endian.")
     end
 end
 
 """
     elfversion(ehdr::Elf64_Ehdr) -> Symbol
 
-If binary has valid ELF version, returns symbol :Current.
+If binary has valid ELF version, else error will occur.
 """
 
 function elfversion(ehdr::Elf64_Ehdr)
-    @match ehdr.e_ident[EI_VERSION] begin
-        0 => error("Invalid ELF version.")
-        1 => :Current
+    try
+        ehdr.e_ident[EI_VERSION]
+    catch
+        error("Invalid ELF version.")
     end
 end
 
 function elfosabi(ehdr::Elf64_Ehdr)
-    arch = @match ehdr.e_ident[EI_OSABI] begin
-        0 => :SystemV
-        1 => :HP_UX
-        2 => :NetBSD
-        3 => :Linux
-        6 => :Solaris
-        7 => :AIX
-        8 => :Irix
-        9 => :FreeBSD
-        10 => :TRU64
-        11 => :Modesto
-        12 => :OpenBSD
-        64 => :ARM
-        97 => :ARM_EABI
-        255 => :Standalone
-        _ => error("Unexpected architecture.")
+    try
+        (arch = EHOsAbi(ehdr.e_ident[EI_OSABI]), version = ehdr.e_ident[EI_OSABI])
+    catch
+        error("Invalid OS ABI")
     end
-
-    (arch = arch, version = ehdr.e_ident[9])
 end
 
 function elftype(ehdr::Elf64_Ehdr)
-    @match ehdr.e_type begin
-        1 => :Rel
-        2 => :Exec
-        3 => :Dyn
-        4 => :Core
-        _ => error("Unknown ELF filetype.")
+    try
+        EHType(ehdr.e_type)
+    catch
+        error("Invalid ELF type.")
     end
 end
 
