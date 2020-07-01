@@ -111,7 +111,7 @@ Elf64_SymInfo(bin::Vector{UInt8}, off::UInt8) =
 """
     Elf64_Rel
 
-A type represents 64bit ELF relocatable symbol.
+A type represents 64bit ELF relocasion table entry (SHT_REL).
 """
 struct Elf64_Rel
     r_offset::Elf64_Addr
@@ -121,6 +121,11 @@ end
 Elf64_Rel(bin::Vector{UInt8}, off::UInt) =
     pointer(bin, off + 1) |> Ptr{Elf64_Rel} |> unsafe_load
 
+"""
+    Elf64_Rel
+
+A type represents 64bit ELF relocasion table entry (SHT_RELA for RISC processors).
+"""
 struct Elf64_Rela
     r_offset::Elf64_Addr
     r_info::Elf64_Xword
@@ -139,6 +144,3 @@ end
 
 Elf64_Chdr(bin::Vector{UInt8}) = pointer(bin, off + 1) |> Ptr{Elf64_Chdr} |> unsafe_load
 
-ELF64_ST_TYPE(val) = val & 0xf
-
-ELF64_R_SYM(i) = i >>> 32

@@ -1,11 +1,4 @@
-export EI_CLASS,
-    EI_DATA,
-    EI_VERSION,
-    EI_OSABI,
-    ELFMAG1,
-    ELFMAG2,
-    ELFMAG3,
-    ELFMAG4
+export EI_CLASS, EI_DATA, EI_VERSION, EI_OSABI, ELFMAG1, ELFMAG2, ELFMAG3, ELFMAG4
 
 include("./types.jl")
 
@@ -354,6 +347,7 @@ end
     SHF_EXCLUDE = (1 << 31)
 end
 
+# if sh_flags = SHF_COMPRESSED
 @enum_export CHType::UInt32 begin
     ELFCOMPRESS_ZLIB = 1
     ELFCOMPRESS_LOOS = 0x60000000
@@ -419,4 +413,45 @@ end
     STV_INTERNAL = 1 #  Processor specific hidden class
     STV_HIDDEN = 2 #  Sym unavailable in other modules
     STV_PROTECTED = 3 #  Not preemptible, not exported
+end
+
+elf32_r_sym(val) = val >>> 8
+elf32_r_type(val) = val & 0xff
+elf32_r_info(sym, type) = (sym << 8) + (type & 0xff)
+
+elf64_st_type(val) = STType(UInt8(val & 0xf))
+elf64_r_sym(i) = i >>> 32
+elf64_r_info(sym, type) = (Elf64_Xword(sym) << 32) + type
+
+# for p_type
+@enum_export PType::UInt32 begin
+    PT_NULL = 0 #   Program header table entry unused
+    PT_LOAD = 1 #   Loadable program segment
+    PT_DYNAMIC = 2 #   Dynamic linking information
+    PT_INTERP = 3 #   Program interpreter
+    PT_NOTE = 4 #   Auxiliary information
+    PT_SHLIB = 5 #   Reserved
+    PT_PHDR = 6 #   Entry for header table itself
+    PT_TLS = 7 #   Thread-local storage segment
+    PT_NUM = 8 #   Number of defined types
+    PT_LOOS = 0x60000000 #  Start of OS-specific 
+    PT_GNU_EH_FRAME = 0x6474e550 #  GCC .eh_frame_hdr segment 
+    PT_GNU_STACK = 0x6474e551 #  Indicates stack executability 
+    PT_GNU_RELRO = 0x6474e552 #  Read-only after relocation 
+    PT_LOSUNW = 0x6ffffffa #
+    # PT_SUNWBSS = 0x6ffffffa #  Sun Specific segment 
+    PT_SUNWSTACK = 0x6ffffffb #  Stack segment 
+    PT_HISUNW = 0x6fffffff #
+    # PT_HIOS = 0x6fffffff #  End of OS-specific 
+    PT_LOPROC = 0x70000000 #  Start of processor-specific 
+    PT_HIPROC = 0x7fffffff #  End of processor-specific 
+end
+
+# for p_flags
+@enum_export PFlags::UInt32 begin
+    PF_X=1
+    PF_W=2
+    PF_R=4
+    PF_MASKOS=0x0ff00000
+    PF_MASKPROC=0xf0000000
 end

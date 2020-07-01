@@ -1,5 +1,4 @@
-- [x] Rewrite utility methods with enum.
 - [x] Rewrite example usage.
+- [x] Rewrite unsafe operation with reinterplet
 - [x] Add tests with ~~example binary~~(serialized data).
 - [ ] Add constants.
-- [x] Write *KUSONAGA BENRI MACRO*
