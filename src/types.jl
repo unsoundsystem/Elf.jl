@@ -1,5 +1,13 @@
 export Elf64_Ehdr,
-    Elf64_Shdr, Elf64_Phdr, Elf64_Rel, Elf64_Rela, Elf64_Sym, ELF64_ST_TYPE, ELF64_R_SYM
+    Elf64_Shdr,
+    Elf64_Phdr,
+    Elf64_Rel,
+    Elf64_Rela,
+    Elf64_Sym,
+    ELF64_ST_TYPE,
+    ELF64_R_SYM,
+    Elf64_Chdr,
+    Elf64_Dyn
 
 const Elf64_Word = UInt32
 const Elf64_Sword = Int32
@@ -34,6 +42,7 @@ struct Elf64_Ehdr
 end
 
 Elf64_Ehdr(bin::Vector{UInt8}) = pointer(bin) |> Ptr{Elf64_Ehdr} |> unsafe_load
+Elf64_Ehdr(bin::Vector{UInt8}, off::UInt) = pointer(bin, off) |> Ptr{Elf64_Ehdr} |> unsafe_load
 
 
 """
@@ -135,7 +144,6 @@ end
 Elf64_Rela(bin::Vector{UInt8}, off::UInt) =
     pointer(bin, off + 1) |> Ptr{Elf64_Rela} |> unsafe_load
 
-
 struct Elf64_Chdr
     ch_type::Elf64_Word # Compression format.
     ch_size::Elf64_Word # Uncompressed size.
@@ -144,3 +152,7 @@ end
 
 Elf64_Chdr(bin::Vector{UInt8}) = pointer(bin, off + 1) |> Ptr{Elf64_Chdr} |> unsafe_load
 
+struct Elf64_Dyn
+    d_tag::Elf64_Xword
+    d_val_or_ptr::UInt64
+end
