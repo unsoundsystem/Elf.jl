@@ -434,24 +434,181 @@ elf64_r_info(sym, type) = (Elf64_Xword(sym) << 32) + type
     PT_PHDR = 6 #   Entry for header table itself
     PT_TLS = 7 #   Thread-local storage segment
     PT_NUM = 8 #   Number of defined types
-    PT_LOOS = 0x60000000 #  Start of OS-specific 
-    PT_GNU_EH_FRAME = 0x6474e550 #  GCC .eh_frame_hdr segment 
-    PT_GNU_STACK = 0x6474e551 #  Indicates stack executability 
-    PT_GNU_RELRO = 0x6474e552 #  Read-only after relocation 
+    PT_LOOS = 0x60000000 #  Start of OS-specific
+    PT_GNU_EH_FRAME = 0x6474e550 #  GCC .eh_frame_hdr segment
+    PT_GNU_STACK = 0x6474e551 #  Indicates stack executability
+    PT_GNU_RELRO = 0x6474e552 #  Read-only after relocation
     PT_LOSUNW = 0x6ffffffa #
-    # PT_SUNWBSS = 0x6ffffffa #  Sun Specific segment 
-    PT_SUNWSTACK = 0x6ffffffb #  Stack segment 
+    # PT_SUNWBSS = 0x6ffffffa #  Sun Specific segment
+    PT_SUNWSTACK = 0x6ffffffb #  Stack segment
     PT_HISUNW = 0x6fffffff #
-    # PT_HIOS = 0x6fffffff #  End of OS-specific 
-    PT_LOPROC = 0x70000000 #  Start of processor-specific 
-    PT_HIPROC = 0x7fffffff #  End of processor-specific 
+    # PT_HIOS = 0x6fffffff #  End of OS-specific
+    PT_LOPROC = 0x70000000 #  Start of processor-specific
+    PT_HIPROC = 0x7fffffff #  End of processor-specific
 end
 
 # for p_flags
 @enum_export PFlags::UInt32 begin
-    PF_X=1
-    PF_W=2
-    PF_R=4
-    PF_MASKOS=0x0ff00000
-    PF_MASKPROC=0xf0000000
+    PF_X = 1
+    PF_W = 2
+    PF_R = 4
+    PF_MASKOS = 0x0ff00000
+    PF_MASKPROC = 0xf0000000
 end
+
+# values for note segmets
+@enum_export NoteTypes::UInt32 begin
+    NT_PRSTATUS = 1 # Contains copy of prstatus struct
+    # NT_PRFPREG = 2 # Contains copy of fpregset struct.
+    NT_FPREGSET = 2 # Contains copy of fpregset struct
+    NT_PRPSINFO = 3 # Contains copy of prpsinfo struct
+    NT_PRXREG = 4 # Contains copy of prxregset struct
+    # NT_TASKSTRUCT = 4 # Contains copy of task structure
+    NT_PLATFORM = 5 # String from sysinfo(SI_PLATFORM)
+    NT_AUXV = 6 # Contains copy of auxv array
+    NT_GWINDOWS = 7 # Contains copy of gwindows struct
+    NT_ASRS = 8 # Contains copy of asrset struct
+    NT_PSTATUS = 10 # Contains copy of pstatus struct
+    NT_PSINFO = 13 # Contains copy of psinfo struct
+    NT_PRCRED = 14 # Contains copy of prcred struct
+    NT_UTSNAME = 15 # Contains copy of utsname struct
+    NT_LWPSTATUS = 16 # Contains copy of lwpstatus struct
+    NT_LWPSINFO = 17 # Contains copy of lwpinfo struct
+    NT_PRFPXREG = 20 # Contains copy of fprxregset struct
+    NT_SIGINFO = 0x53494749 # Contains copy of siginfo_t, size might increase
+    NT_FILE = 0x46494c45 # Contains information about mapped files
+    NT_PRXFPREG = 0x46e62b7f # Contains copy of user_fxsr_struct
+    NT_PPC_VMX = 0x100 # PowerPC Altivec/VMX registers
+    NT_PPC_SPE = 0x101 # PowerPC SPE/EVR registers
+    NT_PPC_VSX = 0x102 # PowerPC VSX registers
+    NT_PPC_TAR = 0x103 # Target Address Register
+    NT_PPC_PPR = 0x104 # Program Priority Register
+    NT_PPC_DSCR = 0x105 # Data Stream Control Register
+    NT_PPC_EBB = 0x106 # Event Based Branch Registers
+    NT_PPC_PMU = 0x107 # Performance Monitor Registers
+    NT_PPC_TM_CGPR = 0x108 # TM checkpointed GPR Registers
+    NT_PPC_TM_CFPR = 0x109 # TM checkpointed FPR Registers
+    NT_PPC_TM_CVMX = 0x10a # TM checkpointed VMX Registers
+    NT_PPC_TM_CVSX = 0x10b # TM checkpointed VSX Registers
+    NT_PPC_TM_SPR = 0x10c # TM Special Purpose Registers
+    NT_PPC_TM_CTAR = 0x10d # TM checkpointed Target Address Register
+    NT_PPC_TM_CPPR = 0x10e # TM checkpointed Program Priority Register
+    NT_PPC_TM_CDSCR = 0x10f # TM checkpointed Data Stream Control Register
+    NT_PPC_PKEY = 0x110 # Memory Protection Keys registers.
+    NT_386_TLS = 0x200 # i386 TLS slots (struct user_desc)
+    NT_386_IOPERM = 0x201 # x86 io permission bitmap (1=deny)
+    NT_X86_XSTATE = 0x202 # x86 extended state using xsave
+    NT_S390_HIGH_GPRS = 0x300 # s390 upper register halves
+    NT_S390_TIMER = 0x301 # s390 timer register
+    NT_S390_TODCMP = 0x302 # s390 TOD clock comparator register
+    NT_S390_TODPREG = 0x303 # s390 TOD programmable register
+    NT_S390_CTRS = 0x304 # s390 control registers
+    NT_S390_PREFIX = 0x305 # s390 prefix register
+    NT_S390_LAST_BREAK = 0x306 # s390 breaking event address
+    NT_S390_SYSTEM_CALL = 0x307 # s390 system call restart data
+    NT_S390_TDB = 0x308 # s390 transaction diagnostic block
+    NT_S390_VXRS_LOW = 0x309 # s390 vector registers 0-15 upper half.
+    NT_S390_VXRS_HIGH = 0x30a # s390 vector registers 16-31.
+    NT_S390_GS_CB = 0x30b # s390 guarded storage registers.
+    NT_S390_GS_BC = 0x30c # s390 guarded storage broadcast control block.
+    NT_S390_RI_CB = 0x30d # s390 runtime instrumentation.
+    NT_ARM_VFP = 0x400 # ARM VFP/NEON registers
+    NT_ARM_TLS = 0x401 # ARM TLS register
+    NT_ARM_HW_BREAK = 0x402 # ARM hardware breakpoint registers
+    NT_ARM_HW_WATCH = 0x403 # ARM hardware watchpoint registers
+    NT_ARM_SYSTEM_CALL = 0x404 # ARM system call number
+    NT_ARM_SVE = 0x405 # ARM Scalable Vector Extension registers
+    NT_ARM_PAC_MASK = 0x406 # ARM pointer authentication code masks.
+    NT_ARM_PACA_KEYS = 0x407 # ARM pointer authentication address keys.
+    NT_ARM_PACG_KEYS = 0x408 # ARM pointer authentication generic key.
+    NT_VMCOREDD = 0x700 # Vmcore Device Dump Note.
+    NT_MIPS_DSP = 0x800 # MIPS DSP ASE registers.
+    NT_MIPS_FP_MODE = 0x801 # MIPS floating-point mode.
+    # NT_MIPS_MSA = 0x802 # MIPS SIMD registers.
+end
+
+const NT_VERSION = 1
+
+@enum_export DTag::UInt32 begin
+
+    DT_NULL = 0 # Marks end of dynamic section
+    DT_NEEDED = 1 # Name of needed library
+    DT_PLTRELSZ = 2 # Size in bytes of PLT relocs
+    DT_PLTGOT = 3 # Processor defined value
+    DT_HASH = 4 # Address of symbol hash table
+    DT_STRTAB = 5 # Address of string table
+    DT_SYMTAB = 6 # Address of symbol table
+    DT_RELA = 7 # Address of Rela relocs
+    DT_RELASZ = 8 # Total size of Rela relocs
+    DT_RELAENT = 9 # Size of one Rela reloc
+    DT_STRSZ = 10 # Size of string table
+    DT_SYMENT = 11 # Size of one symbol table entry
+    DT_INIT = 12 # Address of init function
+    DT_FINI = 13 # Address of termination function
+    DT_SONAME = 14 # Name of shared object
+    DT_RPATH = 15 # Library search path (deprecated)
+    DT_SYMBOLIC = 16 # Start symbol search here
+    DT_REL = 17 # Address of Rel relocs
+    DT_RELSZ = 18 # Total size of Rel relocs
+    DT_RELENT = 19 # Size of one Rel reloc
+    DT_PLTREL = 20 # Type of reloc in PLT
+    DT_DEBUG = 21 # For debugging; unspecified
+    DT_TEXTREL = 22 # Reloc might modify .text
+    DT_JMPREL = 23 # Address of PLT relocs
+    DT_BIND_NOW = 24 # Process relocations of object
+    DT_INIT_ARRAY = 25 # Array with addresses of init fct
+    DT_FINI_ARRAY = 26 # Array with addresses of fini fct
+    DT_INIT_ARRAYSZ = 27 # Size in bytes of DT_INIT_ARRAY
+    DT_FINI_ARRAYSZ = 28 # Size in bytes of DT_FINI_ARRAY
+    DT_RUNPATH = 29 # Library search path
+    DT_FLAGS = 30 # Flags for the object being loaded
+    # DT_ENCODING = 32 # Start of encoded range
+    DT_PREINIT_ARRAY = 32 # Array with addresses of preinit fct
+    DT_PREINIT_ARRAYSZ = 33 # size in bytes of DT_PREINIT_ARRAY
+    DT_SYMTAB_SHNDX = 34 # Address of SYMTAB_SHNDX section
+    DT_NUM = 35 # Number used
+    DT_LOOS = 0x6000000d # Start of OS-specific
+    DT_HIOS = 0x6ffff000 # End of OS-specific
+    DT_LOPROC = 0x70000000 # Start of processor-specific
+    DT_HIPROC = 0x7fffffff # End of processor-specific
+    # DT_PROCNUM = DT_MIPS_NUM # Most used by any processor
+end
+
+@enum_export DPtr::UInt32 begin
+    DT_ADDRRNGLO = 0x6ffffe00
+    DT_GNU_HASH = 0x6ffffef5 # GNU-style hash table.
+    DT_TLSDESC_PLT = 0x6ffffef6
+    DT_TLSDESC_GOT = 0x6ffffef7
+    DT_GNU_CONFLICT = 0x6ffffef8 # Start of conflict section
+    DT_GNU_LIBLIST = 0x6ffffef9 # Library list
+    DT_CONFIG = 0x6ffffefa # Configuration information.
+    DT_DEPAUDIT = 0x6ffffefb # Dependency auditing.
+    DT_AUDIT = 0x6ffffefc # Object auditing.
+    DT_PLTPAD = 0x6ffffefd # PLT padding.
+    DT_MOVETAB = 0x6ffffefe # Move table.
+    DT_SYMINFO = 0x6ffffeff # Syminfo table.
+    # DT_ADDRRNGHI = 0x6ffffeff
+    DT_ADDRNUM = 11
+end
+
+dt_addrtagidx(tag) = (DT_ADDRRNGHI - (tag)) # Reverse order!
+
+@enum_export DVal::UInt32 begin
+    DT_VALRNGLO = 0x6ffffd00
+    DT_GNU_PRELINKED = 0x6ffffdf5 # Prelinking timestamp
+    DT_GNU_CONFLICTSZ = 0x6ffffdf6 # Size of conflict section
+    DT_GNU_LIBLISTSZ = 0x6ffffdf7 # Size of library list
+    DT_CHECKSUM = 0x6ffffdf8
+    DT_PLTPADSZ = 0x6ffffdf9
+    DT_MOVEENT = 0x6ffffdfa
+    DT_MOVESZ = 0x6ffffdfb
+    DT_FEATURE_1 = 0x6ffffdfc # Feature selection (DTF_*).
+    DT_POSFLAG_1 = 0x6ffffdfd # Flags for DT_* entries, effecting the following DT_* entry.
+    DT_SYMINSZ = 0x6ffffdfe # Size of syminfo table (in bytes)
+    DT_SYMINENT = 0x6ffffdff # Entry size of syminfo
+    # DT_VALRNGHI = 0x6ffffdff
+    DT_VALNUM = 12
+
+end
+
+dt_valtagidx(tag) = (DT_VALRNGHI - (tag)) # Reverse order!

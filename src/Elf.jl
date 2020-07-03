@@ -177,7 +177,7 @@ function symbols(bin::Vector{UInt8})
         for j = 0:(div(rel.sh_size, rel.sh_entsize) - 1)
             relp = Elf64_Rel(bin, rel.sh_offset + rel.sh_entsize * j)
             symp =
-                Elf64_Sym(bin, sym.sh_offset + (sym.sh_entsize * ELF64_R_SYM(relp.r_info)))
+                Elf64_Sym(bin, sym.sh_offset + (sym.sh_entsize * elf64_r_sym(relp.r_info)))
             if symp.st_name == 0
                 continue
             end
