@@ -131,9 +131,9 @@ Elf64_Rel(bin::Vector{UInt8}, off::UInt) =
     pointer(bin, off + 1) |> Ptr{Elf64_Rel} |> unsafe_load
 
 """
-    Elf64_Rel
+    Elf64_Rela
 
-A type represents 64bit ELF relocasion table entry (SHT_RELA for RISC processors).
+A type represents 64bit ELF relocasion table entry (SHT_RELA).
 """
 struct Elf64_Rela
     r_offset::Elf64_Addr
@@ -144,15 +144,25 @@ end
 Elf64_Rela(bin::Vector{UInt8}, off::UInt) =
     pointer(bin, off + 1) |> Ptr{Elf64_Rela} |> unsafe_load
 
+
+# struct SymbolTable64
+    # syms::Vector{Union{Elf64_Rel, Elf64_Rela}}
+
+    # function SymbolTable64(relsec::Elf64_Shdr)
+        # for i=
+# end
+
 struct Elf64_Chdr
     ch_type::Elf64_Word # Compression format.
     ch_size::Elf64_Word # Uncompressed size.
     ch_addralign::Elf64_Xword # Uncompressed data alignment.
 end
 
-Elf64_Chdr(bin::Vector{UInt8}) = pointer(bin, off + 1) |> Ptr{Elf64_Chdr} |> unsafe_load
+Elf64_Chdr(bin::Vector{UInt8}, off::UInt) = pointer(bin, off + 1) |> Ptr{Elf64_Chdr} |> unsafe_load
 
 struct Elf64_Dyn
     d_tag::Elf64_Xword
     d_val_or_ptr::UInt64
 end
+
+Elf64_Dyn(bin::Vector{UInt8}, off::UInt) = pointer(bin, off + 1) |> Ptr{Elf64_Dyn} |> unsafe_load

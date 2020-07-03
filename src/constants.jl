@@ -530,7 +530,6 @@ end
 const NT_VERSION = 1
 
 @enum_export DTag::UInt32 begin
-
     DT_NULL = 0 # Marks end of dynamic section
     DT_NEEDED = 1 # Name of needed library
     DT_PLTRELSZ = 2 # Size in bytes of PLT relocs

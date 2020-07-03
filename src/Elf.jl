@@ -2,7 +2,15 @@ module Elf
 using Base
 using StaticArrays, DataStructures
 
-export iself, elfclass, endian, sections, segments, symbols, elfosabi
+export iself,
+    elfclass,
+    endian,
+    sections,
+    segments,
+    symbols,
+    elfosabi,
+    elftype
+
 include("./constants.jl")
 # include("./types.jl")
 

@@ -14,6 +14,9 @@ function main()
 
     !(endian(ehdr) == ELFDATA2MSB) && error("Unknown endian.")
 
+    # Print ELF file type
+    println("ELF Type: $(elftype(ehdr))")
+
     # Print Section Names
     println("Sections:")
     for (i, s) in enumerate(collect(sections(bin)))
