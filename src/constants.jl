@@ -1,4 +1,4 @@
-export EI_CLASS, EI_DATA, EI_VERSION, EI_OSABI, ELFMAG1, ELFMAG2, ELFMAG3, ELFMAG4
+export EI_CLASS, EI_DATA, EI_VERSION, EI_OSABI, ELFMAG1, ELFMAG2, ELFMAG3, ELFMAG4, elf64_st_type, elf64_r_info, elf64_r_sym
 
 include("./types.jl")
 

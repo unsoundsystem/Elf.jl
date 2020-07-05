@@ -20,7 +20,7 @@ function main()
     # Print Section Names
     println("Sections:")
     for (i, s) in enumerate(collect(sections(bin)))
-        println("\t[$i]:\t$(s.first)")
+        println("\t[$i]:\t\"$(s.first)\"$(" " ^ (25 - length(s.first)))type: $(SHType(s.second.sh_type))")
     end
     println()
 
@@ -35,7 +35,7 @@ function main()
     syms, rels = symbols(bin)
 
     for (i, s) in enumerate(collect(syms))
-        println("\t[$i]:\t$(s.first)")
+        println("\t[$i]:\t\"$(s.first)\"$(" " ^ (50 - length(s.first)))type: $(elf64_st_type(s.second.st_info))")
     end
 
     println()
